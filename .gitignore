@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS system files
+.DS_Store
+
+# Editor temporary files and backups
+*.swp
+*~
+*.txt~
+
+# Environments and virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# SQLite databases 
+# Since I do WANT to include ProjGutBooks.db for this project
+# do NOT exclude "*.db" files here.
