@@ -1,4 +1,4 @@
-# Project Gutenberg Word-Frequency Analyzer
+# Project Gutenberg Texts - Word Frequency Analyzer
 **Author:** Karen R. Christie  
 **Developed:** November–December 2025  
 **Documentation Written:** May 2026
@@ -9,7 +9,7 @@ This Python application provides a robust system for the automated retrieval and
 ### Key Features:
 * **Dynamic Web Retrieval:** Utilizes a custom `HTMLParser` subclass and the `requests` library to fetch live texts, stripping Gutenberg-specific headers and footers to isolate the core content.
 * **Relational Persistence:** Implements a normalized **SQLite3** database using a `bookAuthors` junction table to manage many-to-many relationships between books and multiple authors, ensuring data integrity and reducing redundancy.
-* **Scientific Curation Utility:** Includes a specialized CLI tool for iterative "noise" reduction, allowing for the manual refinement of `stopwords.txt` to improve retrieval of words that are biologically significant for a given text.
+* **Scientific Curation Utility:** Includes a specialized CLI tool for iterative "noise" reduction, allowing for the manual refinement of the `stopwords.txt` file to improve retrieval of words that are biologically significant for a given text.
 * **Decoupled Architecture:** Built with a strict separation of concerns, keeping the data processing logic entirely independent of the Tkinter graphical interface.
 * **Custom Graphical Interface:** Features a beautiful custom **Tkinter-based GUI** with a unified green color scheme, real-time progress log, dynamic search results, and integrated state management.
 * **Plain-Text Metadata Extraction:** Utilizes basic string manipulation to isolate the Title and **regular expressions** to extract the Author block from predictable plain-text Gutenberg headers.
@@ -58,7 +58,7 @@ The application utilizes a normalized SQLite3 relational schema designed to ensu
 * **bookAuthors:** A junction table facilitating the many-to-many relationship between books and authors.
     * `projGutID` (PK, FK): Links to `book.projGutID`.
     * `author_id` (PK, FK): Links to `author.id`.
-    * `author_order`: Preserves the scholarly order of authors as listed in the original text.
+    * `author_order`: Preserves the order of authors as listed in the original text.
 * **wordFreqs:** A persistence layer for processed text data, allowing for instant pre-loading of results without re-analyzing raw text.
     * `projGutID` (PK, FK): Links to `book.projGutID`.
     * `word` (PK): The unique word entry for that specific book.
@@ -67,13 +67,8 @@ The application utilizes a normalized SQLite3 relational schema designed to ensu
 ![Database ER Diagram](./img/db-schema-gutenberg.png)
 
 ### Implementation Note: Database Location
-For the purpose of this demonstration, the `ProjGutBooks.db` file is located within the `/src` directory alongside the application logic. This configuration ensures that the application runs immediately upon download without requiring manual environment setup or path configuration. 
+For the purpose of easy demonstration, a small set of books that have already been analyzed is provided in the `ProjGutBooks.db` file located within the `/src` directory alongside the application logic. This configuration ensures that the application runs immediately upon download without requiring manual environment setup or path configuration. 
 
-In a production-level environment, standard practice would involve:
-1. Moving the database to a dedicated `/data` directory.
-2. Utilizing the `pathlib` module for dynamic, cross-platform path resolution. 
-
-This simplified structure was chosen to facilitate ease of use for academic review while maintaining internal technical accuracy.
 ---
 
 ## System Architecture
@@ -172,7 +167,7 @@ classDiagram
 * **GUI Controller (`ProjGut-gui_main.py`):** Acts as the central orchestrator, managing the Tkinter event loop, themed user dialogs, and coordinating the flow between user input, text extraction, and database persistence.
 * **Data Access Layer (`helpers_db.py`):** Encapsulates all SQLite3 operations. It manages the normalized relational schema, atomic transactions, and handles many-to-many relationships between books and authors.
 * **Extraction & Parsing (`helpers_text.py`):** Provides stateless utilities for web retrieval and tokenization. It utilizes a custom `HTMLParser` subclass (`MyHTMLParser`) to transform raw web text into analyzed word frequencies.
-* **Curation Pipeline (`build_stopword_file_helper.py`):** A standalone CLI utility designed for iterative "noise" reduction. It utilizes its own `StopwordParser` to generate comprehensive TSV reports for manual refinement of the persistent stopword library.
+* **Curation Pipeline (`build_stopword_file_helper.py`):** A standalone CLI utility designed for iterative "noise" reduction. It utilizes its own `StopwordParser` to allow the user to print 10-40 of the most frequent words on screen and also generates comprehensive TSV reports for manual refinement of the persistent stopword library.
 ---
 
 ## Project Structure
@@ -201,9 +196,12 @@ The project is built using a modular layer-based architecture to ensure maintain
    ```
 2. **Environment & Dependencies:**
    ```bash
+   # Create and activate virtual environment
    python -m venv .venv
    source .venv/bin/activate  # Windows: .venv\Scripts\activate
-   pip install requests
+
+   # Install required libraries
+   pip install -r requirements.txt
    ```
 
 ---
@@ -214,7 +212,7 @@ The project is built using a modular layer-based architecture to ensure maintain
     * **Find a new book of interest:** Click the "Browse the Project Gutenberg biology shelf for ideas" link to open the Project Gutenberg Biology Shelf
     * **Enter ID:** Enter a specific Project Gutenberg Book ID to fetch a text directly from the web & display Top 10 Interesting Words.
     * **Automatic title detection:** Upon clicking the SUBMIT button, the system utilizes string manipulation to isolate the title from the header, automatically inserting it into the database, and reporting this info in the "Progress Log" results pane.
-    * **Manual curation of author info:** As author information is not present in a format that allows automated parsing, the "Extracted Author Block" from the header is displayed in the "Progress Log" results pane to allow manual entry by the user.
+    * **Manual curation of author info:** As author information is not present in a consistent format that allows automated parsing, the "Extracted Author Block" from the header is displayed in the "Progress Log" results pane to allow manual entry by the user.
         * **Number of Authors:** A pop-up window requests entry of the number of authors of the book.
         * **FIRST & MIDDLE names of Author:** A pop-up window requests entry of the FIRST & MIDDLE name(s) of the first author. Enter 'none' if the author goes by a single name, e.g. Aristotle.
         * **LAST name of Author:** A pop-up window requests entry of the LAST name of the first author. For authors known by a single name, e.g. Aristotle, enter it here.
